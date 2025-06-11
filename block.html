@@ -1,0 +1,100 @@
+<div id="deletePasswordWindow" style="display:none;">
+    <h2>Delete Password from Password Storage</h2>
+    <form>
+            <label for="webpage">Webpage Name:</label> <br>
+            <input type="text" id="deletewebpage" name="deletewebpage" value="" style="width: 500px; height:25px;" ><br><br>
+            <button onclick=deletePassword() type="button" style="height: 40px; width: 500px;">Delete</button>
+        </form>
+          
+      </div>
+  </div> 
+
+  <div id="editPasswordWindow" class="showModal" style="display:none">
+    <button id="savemodalclose" onclick="document.getElementById('editPasswordWindow').style.display = 'none'" type="button" >Close</button>
+    <h2>Edit a Password</h2>
+    <form class="saveModal-content" action="#">
+            <button onclick="document.getElementById('userformpart').style.display = 'inline'" type="button">Change Username</button>
+            <button onclick="document.getElementById('passformpart').style.display = 'inline'" type="button">Change Password</button><br>
+            <label for="webpage">Webpage Name:</label> <br>
+            <input type="text" id="editwebpage" name="editwebpage" value="" style="width: 500px; height:25px;"><br><br>
+            <div id="userformpart" style="display:none">
+                <label for="username">Username/Email:</label><br>
+                <input type="text" id="editusername" name="editusername" value="" style="width: 500px; height:25px;"><br><br>
+            </div>
+            <div id="passformpart" style="display:none">
+                <label for="password">Password:</label><br>
+                <input type="password" id="editpassword" name="editpassword" value="" style="width: 500px; height:25px;"><br><br><br>
+            </div>
+            <button onclick=editPassword() type="button" style="height: 40px; width: 500px;">Submit</button>
+        </form>
+          
+      </div>
+  </div> 
+
+<div id="generatepasswordWindow" class="showModal" style="display:none;">
+    <button id="savemodalclose" onclick="document.getElementById('generatepasswordWindow').style.display = 'none'" type="button" >Close</button>
+    <h2>Password Generator</h2>
+    <form>
+        <br><label for="numofchar">Number Of Characters: </label>
+        <input type="number" id="numofchar" name="numofchar" value="" style="width: 200px; height:25px;"><br>
+        <input type="checkbox" id="uchar" name="char" value="">
+        <label for="uchar">Upper Case Characters</label><br><br>
+        <input type="checkbox" id="num" name="num" value="">
+        <label for="num">Numbers</label><br><br>
+        <input type="checkbox" id="sym" name="sym" value="">
+        <label for="sym">Symbols</label><br><br>
+        <button onclick=generatePassword() type="button" style="height: 40px; width: 450px;">Submit</button><br>
+    </form>
+    <h3 id=passwordgen style="display:none">Password Generated: </h3>
+    <d id=passwordGenOutput style="display:none"></d>
+</div>
+
+
+<div id="checkuserpasswordWindow" class="showModal" style="display:none">
+    <button id="savemodalclose" onclick="document.getElementById('checkuserpasswordWindow').style.display = 'none'" type="button" >Close</button>
+    <h2>Check User Password</h2>
+    <p>Use this to check if a password created meets the basic requirements of a good password</p>
+    <form>
+        <br><br><label for="userpass">User Made Password: </label>
+        <input type="password" id="userpass" name="userpass" title="Password must contain at least 8 characters, a number, an uppercase letter and a lowercase letter" value="" style="width: 200px; height:20px;">
+    </form>
+    <div id="passwordmessage">
+        <h3>Any passwords must contain the following:</h3>
+        <c id="length" class="invalid">8 Characters</c><br>
+        <c id="lowercase" class="invalid">A Lowercase Letter</c><br>
+        <c id="uppercase" class="invalid">An Uppercase Letter</c><br>
+        <c id="number" class="invalid">A Number</c><br>
+        <c id="special" class="invalid">A Special Character</c>
+    </div>
+    <div id=passwordmeetsmessage>
+        <h3>This password meets the requirements of a good password</h3>
+    </div>
+    <script src="script.js"></script> 
+
+</div>
+
+
+<div id="showPasswordWindow" class="showModal" style="display:none">
+    <button id="savemodalclose" onclick="document.getElementById('showPasswordWindow').style.display = 'none'">Close</button>
+    <h2>Show Passwords Saved</h2>
+    <div id="showpasswords" class="showModalContent">
+    <button onclick=showAllPasswords() type="button" style="height:40px; width:300px;">Show All Passwords Saved</button><br>
+    <b>To show a specific password, enter the website name below:</b>
+    <input type="text" id="webpageShow" name="webpageShow" placeholder="Enter Website Name Here: ">
+    <button onclick=showSelectedPassword() type="button" style="height:40px; width:300px;">Show Selected Password</button>
+    <div id="showpasswordselected">
+        <h3>Username/Email: </h3>
+        <d id=usernameOutput style="display:none"></d><br>
+        <h3>Password: </h3>
+        <d id=passwordOutput style="display:none"></d><br>
+    </div>
+    <div id="tablepasswords">
+    <table id="table" border="1" style="width: 100%; display:none;">
+        <tr>
+            <th style="width: 75px;">Website</th>
+            <th style="width: 75px;">Username</th>
+            <th style="width: 75px">Password</th>
+        </tr>
+    </table>
+    </div>
+    </div>

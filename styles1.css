@@ -1,0 +1,157 @@
+p, a {
+color: black;
+font-family: "Verdana";
+text-align: center;
+}
+
+h1 {
+    font-family: "Arial";
+    font-size: 2.6em;
+    text-align: center;
+}
+
+h2 {
+    font-family: "Arial";
+    text-align:center;
+}
+
+body {
+    padding: 15px;
+    background-color: white;
+    color: black;
+  }
+
+div.tablepasswords {
+    top:100px;
+    left:90px;
+}
+#passwordmessage {
+    background: transparent;
+    color: #000;
+    position: relative;
+    padding: 20px;
+    margin-top: 10px;
+}
+#passwordmeetsmessage {
+    display: none;
+}
+.valid {
+    color:greenyellow;
+}
+
+.invalid {
+    color:red;
+}
+
+#main-title {
+font-family: "Arial";
+color:black;
+text-align: center;
+}
+
+input {
+    padding: 10px;
+    margin-top: 25px;
+    border-radius: 30px;
+    background: transparent;
+    border: 0.5px solid green;
+    color: #000;
+    font-size: 15px;
+    width: 250px;
+}
+button {
+    background: rgba(0, 132, 255, 0.781);
+    color: white;
+    padding: 10px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    margin-top: 15px;
+}
+button:hover {
+    background: transparent;
+    color: black;
+    outline: 1px solid #fff;
+}
+.logoutbutton {
+    position:absolute;
+    top:10px;
+    right:30px;
+    width: 150px;
+}
+.clearbutton {
+    position:absolute;
+    top:50px;
+    right:30px;
+    width: 150px;
+}
+
+.settingsbutton {
+    position:absolute;
+    top:90px;
+    right:30px;
+    width: 150px;
+}
+
+#menuLabel {
+    font-family: Verdana;
+}
+
+.modal {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: white;
+    font-family: Verdana;
+}
+  
+.modal-content {
+    margin: 0;
+    width: 40%;
+    text-align: center;
+    padding-bottom: 20px;
+}
+
+  
+div.savePasswordArea {
+    display: block;
+    position: absolute;
+    top:150px;
+    left:10px;
+    transform: translateX(-50%);
+    text-align: center;
+}
+div.showModal {
+    display: block;
+    position: absolute;
+    z-index: auto;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 60%;
+    height: 60%;
+    overflow: auto;
+    background-color: #ffffff;
+    padding-top: 30px;
+    padding-left:10px;
+    font-family: Verdana;
+}
+.showModalContent {
+    margin: 10px;
+    width: 40%;
+    text-align: left;
+    padding-bottom: 10px;
+  }
+  
+#showmodalclose {
+    position:absolute;
+    top:10px;
+    right:10px;
+}
