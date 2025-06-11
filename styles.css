@@ -221,7 +221,7 @@ button:hover {
 }
 
 #showPasswordArea {
-    width: fit-content + 10px;
+    width: fit-content;
     height: 673px; /* Matches the bottom border of the generate password area */
     border: #000 solid 1px;
     background-color: #ffffff;
@@ -233,7 +233,7 @@ button:hover {
 }
 
 #generatePasswordArea {
-    width: 580px;
+    width: 500px;
     height:340px;
     right:30%; 
     position: absolute; 
@@ -262,7 +262,7 @@ label {
 
 
 .group {
-    width:580px;
+    width:500px;
     right:30%;
     position: absolute;
     top: 142px;
