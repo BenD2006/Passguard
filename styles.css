@@ -235,7 +235,7 @@ button:hover {
 #generatePasswordArea {
     width: 500px;
     height:340px;
-    right:30%; 
+    right:20%; 
     position: absolute; 
     top: 515px;
     border: #000 solid 1px;
