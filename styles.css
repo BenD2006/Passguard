@@ -233,9 +233,9 @@ button:hover {
 }
 
 #generatePasswordArea {
-    width: 500px;
+    width: 550px;
     height:340px;
-    right:20%; 
+    right:32%; 
     position: absolute; 
     top: 515px;
     border: #000 solid 1px;
@@ -262,8 +262,8 @@ label {
 
 
 .group {
-    width:500px;
-    right:30%;
+    width:550px;
+    right:32%;
     position: absolute;
     top: 142px;
     height:340px;
