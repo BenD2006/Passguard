@@ -11,12 +11,12 @@ onload = function() {
     // Check if the user is logged in when the page loads
     if (localStorage.getItem("loggedIn") === "true") {
         document.getElementById("loginWindow").style.display = "none";
-        document.getElementById("page").style.display = "flex";
+        document.getElementById("mainContainer").style.display = "flex";
         document.getElementById("menuRight").style.display = "flex";
         displayPasswords();
     } else {
         document.getElementById("loginWindow").style.display = "flex";
-        document.getElementById("page").style.display = "none";
+        document.getElementById("mainContainer").style.display = "none";
         document.getElementById("menuRight").style.display = "none";
     }
 }
@@ -70,7 +70,7 @@ async function login() {
     if (usernameCorrect == true && passwordCorrect == true) {
         localStorage.setItem("loggedIn", "true");
         document.getElementById("loginWindow").style.display = "none";
-        document.getElementById("page").style.display = "flex";
+        document.getElementById("mainContainer").style.display = "flex";
         document.getElementById("menuRight").style.display = "flex";
         displayPasswords();
     } else {
@@ -123,7 +123,7 @@ async function newPassword() {
     document.getElementById("passreset").style.display = "none";
     document.getElementById("loginWindow").style.display = "none";
     document.getElementById("forgotpassword").style.display = "none";
-    document.getElementById("page").style.display = "block";
+    document.getElementById("mainContainer").style.display = "block";
     document.getElementById("menuRight").style.display = "flex";
     
 
@@ -232,7 +232,7 @@ async function editPassword() {
     alert("Sucessfully Edited");
     if (document.getElementById("editpasswordmodal").style.display === "block") {
         document.getElementById("editpasswordmodal").style.display = "none";
-        document.getElementById("page").style.display = "flex";
+        document.getElementById("mainContainer").style.display = "flex";
 
     }
     displayPasswords();
@@ -406,7 +406,7 @@ async function displayPasswords() {
         `;
 
         row.addEventListener('click', () => {
-            document.getElementById("page").style.display = "none";
+            document.getElementById("mainContainer").style.display = "none";
             document.getElementById("editpasswordmodal").style.display = "block";
             document.getElementById("editwebpage").value = password.websiteName;
             document.getElementById("editusername").value = password.userName;

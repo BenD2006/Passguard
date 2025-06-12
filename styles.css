@@ -1,28 +1,118 @@
-p, a {
+* {
+    font-family: "Tahoma";
+}
+
+p, a, c  {
     color: black;
-    font-family: "Arial";
     text-align: center;
 }
-
-c {
-    color: black;
-    font-family: "Arial";
-    text-align: left;
-}
     
-h1 {
-        font-family: "Arial";
-        font-size: 2.6em;
+h1, h2, h3 {
         text-align: center;
 }
-    
-h2 {
-        font-family: "Arial";
-        text-align:center;
+
+input {
+    padding: 10px;
+    margin-top: 25px;
+    border-radius: 30px;
+    background: transparent;
+    border: 0.5px solid rgba(0, 132, 255, 0.781);
+    color: #000;
+    font-size: 15px;
 }
 
-h3 {
-    font-family: "Arial";
+label {
+    font-size: 1.1em;
+    color: black;
+    text-align: left;
+}
+
+button {
+    background: rgba(0, 132, 255, 0.781);
+    color: white;
+    padding: 10px;
+    border: none;
+    border-radius: 30px;
+    cursor: pointer;
+    margin-top: 15px;
+}
+
+button:hover {
+    background: transparent;
+    color: black;
+    outline: 1px solid rgba(0, 132, 255, 0.781);
+}
+
+.modal {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: white;
+}
+
+.editmodal {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    z-index: 1;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 50%;
+    height: 60%;
+    overflow: auto;
+    background-color: white;
+}
+
+.searchResultsModal {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 300px;
+    padding: 20px;
+    background: white;
+    border-radius: 10px;
+}
+
+.modal-content {
+    margin: 0;
+    width: 40%;
+    text-align: center;
+    padding-bottom: 20px;
+
+}
+
+.logoutbutton {
+    position:absolute;
+    top:0px;
+    right:30px;
+    width: 150px;
+}
+.clearbutton {
+    position:absolute;
+    top:40px;
+    right:30px;
+    width: 150px;
+}
+
+.settingsbutton {
+    position:absolute;
+    top:80px;
+    right:30px;
+    width: 150px;
 }
 
 #searchContainer {
@@ -40,98 +130,8 @@ h3 {
     border: 1px solid #ccc;
 }
 
-#searchResultsModal {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 300px;
-    padding: 20px;
-    background: white;
-    border-radius: 10px;
-}
 
-input {
-        padding: 10px;
-        margin-top: 25px;
-        border-radius: 30px;
-        background: transparent;
-        border: 0.5px solid green;
-        color: #000;
-        font-size: 15px;
-        width: 250px;
-}
-label {
-        font-family: "Arial";
-        font-size: 1.1em;
-        color: black;
-        text-align: center;
-}
-button {
-        background: rgba(0, 132, 255, 0.781);
-        color: white;
-        padding: 10px;
-        border: none;
-        border-radius: 30px;
-        cursor: pointer;
-        margin-top: 15px;
-}
 
-button:hover {
-        background: transparent;
-        color: black;
-        outline: 1px solid #fff;
-}
-
-.modal {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: fixed;
-    z-index: 1;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    overflow: auto;
-    background-color: white;
-    font-family: Verdana;
-}
-.modal-content {
-    margin: 0;
-    width: 40%;
-    text-align: center;
-    padding-bottom: 20px;
-
-}
-
-.editmodal {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: fixed;
-    z-index: 1;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    width: 50%;
-    height: 60%;
-    overflow: auto;
-    background-color: white;
-    font-family: Verdana;
-}
-
-.editmodal-content {
-    margin: 0;
-    width: 40%;
-    text-align: center;
-    padding-bottom: 20px;
-
-}
 
 #passwordTable {
     width: 500px;
@@ -156,37 +156,9 @@ button:hover {
     font-size: 14px;
 }
 
-#passwordTable tbody tr:nth-child(even) {
-    background-color: #f2f2f2; /* Light gray for alternating rows */
-}
-
-#passwordTable tbody tr:nth-child(odd) {
-    background-color: #ffffff; /* White for alternating rows */
-}
-
 #passwordTable tbody tr:hover {
     background-color: #ffeb99; /* Light yellow on hover */
     cursor: pointer;
-}
-
-.logoutbutton {
-    position:absolute;
-    top:0px;
-    right:30px;
-    width: 150px;
-}
-.clearbutton {
-    position:absolute;
-    top:40px;
-    right:30px;
-    width: 150px;
-}
-
-.settingsbutton {
-    position:absolute;
-    top:80px;
-    right:30px;
-    width: 150px;
 }
 
 .searchbutton {
@@ -244,24 +216,8 @@ button:hover {
     padding: 10px;
 }
 
-#userformpart, #passformpart {
-    display: flex;
-    justify-content: space-between;
-    gap: 10px;
-}
 
-#userformpart div, #passformpart div {
-    display: flex;
-    align-items: center;
-    column-gap: 15px;
-}
-
-label {
-    white-space: nowrap; /* Prevents the label from breaking onto a new line */
-}
-
-
-.group {
+#checkPasswordArea {
     width:550px;
     right:32%;
     position: absolute;
@@ -273,12 +229,12 @@ label {
     padding: 10px;
 }
 
-.group label {
+#checkPasswordArea label {
     display: block;
     padding: 20px 0;
 }
 
-.group input {
+#checkPasswordArea input {
     border: none;
     outline: none;
     padding: 20px;
@@ -289,45 +245,18 @@ label {
     font-size: 20px;
 }
 
-.group .power-container {
+#checkPasswordArea .power-container {
     background-color: #2E424D;
     width: 100%;
     height: 15px;
     border-radius: 5px;
 }
 
-.group .power-container #power-point {
+#checkPasswordArea .power-container #power-point {
     background-color: #D73F40;
     width: 1%;
     height: 100%;
     border-radius: 5px;
-    transition: 0.5s;
+    transition: 1s;
 }
 
-div.showModal {
-    display: block;
-    position: absolute;
-    z-index: auto;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    width: 60%;
-    height: 60%;
-    overflow: auto;
-    background-color: #ffffff;
-    padding-top: 30px;
-    padding-left:10px;
-    font-family: Verdana;
-}
-.showModalContent {
-    margin: 10px;
-    width: 40%;
-    text-align: left;
-    padding-bottom: 10px;
-  }
-  
-#showmodalclose {
-    position:absolute;
-    top:10px;
-    right:10px;
-}

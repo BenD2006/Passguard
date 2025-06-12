@@ -66,9 +66,9 @@
     </div>
 
     <div id="editpasswordmodal" class="editmodal" style="display:none;">
-        <button id="savemodalclose" onclick="document.getElementById('editpasswordmodal').style.display = 'none'; document.getElementById('page').style.display='flex'" type="button">Close</button>
+        <button id="savemodalclose" onclick="document.getElementById('editpasswordmodal').style.display = 'none'; document.getElementById('mainContainer').style.display='flex'" type="button">Close</button>
         <h2>Edit Password</h2>
-        <form class="editModal-content">
+        <form class="modal-content">
             <div style="display: flex; flex-direction: column; align-items: center;">
                 <label for="editwebpage">Website Name:</label>
                 <input type="text" id="editwebpage" name="editwebpage" style="width: 500px;"><br>
@@ -84,7 +84,7 @@
         </form>
     </div>
 
-    <div id="page" style="display:none;">
+    <div id="mainContainer" class="responsive-container" style="display:none;">
         <h1>PassGuard</h1> 
         <div id="menuRight">
             <button type="button" class="logoutbutton" onclick=logout()>Log Out</button>
@@ -130,8 +130,9 @@
                         <!-- Password entries will be dynamically populated here -->
                     </tbody>
                 </table>                
-            </div>
-        <div class="group">
+        </div>
+
+        <div id="checkPasswordArea" class="group">
             <h3>Password Strength Checker</h3>
             <label for="passwordCheck">Enter Password below:</label>
             <input type="text" 
@@ -166,13 +167,13 @@
             <button class="searchbutton" onclick="searchPassword()">Search</button>
         </div>
         
-        <div id="searchResultsModal" class="editmodal" style="display: none;">
+        <div id="searchResultsModal" class="searchResultsModal" style="display: none;">
             <button onclick="closeSearchResults()" type="button">Close</button>
             <h2>Search Results</h2>
             <div id="searchResults"></div>
         </div>
 
-        <div id="settingsWindow" class="showModal" style="display:none">
+        <div id="settingsWindow" class="editModal" style="display:none">
             <button id="savemodalclose" onclick="document.getElementById('settingsWindow').style.display = 'none'" type="button" >Close</button>
             <h2>Settings Page</h2>
             <h3>Background Colour Menu</h3>
