@@ -7,25 +7,19 @@ var credentialsToStore = [];
 var passwordToStoreEncryptIV;
 var passwordToStoreEncrypt;
 
-onload = function() {
-    // Check if the user is logged in when the page loads
-    if (localStorage.getItem("loggedIn") === "true") {
-        document.getElementById("loginWindow").style.display = "none";
-        document.getElementById("mainContainer").style.display = "flex";
-        document.getElementById("menuRight").style.display = "flex";
-        displayPasswords();
-    } else {
-        document.getElementById("loginWindow").style.display = "flex";
-        document.getElementById("mainContainer").style.display = "none";
-        document.getElementById("menuRight").style.display = "none";
-    }
-}
 // Function created to make the new account window and check if user account already exists
 function createAccountWindow() {
     if (localStorage.getItem("loginUser") != ''){
         document.getElementById("createAccount").style.display = "flex";
     } else {
         alert("User already created");
+    }
+}
+
+function checkLogin() {
+    const LoggedIn = localStorage.getItem('loggedIn');
+    if (LoggedIn === null) {
+        window.location.href = "index.html";
     }
 }
 
@@ -43,10 +37,17 @@ async function createAccount() {
     let q1ans = document.getElementById("sq1-answer").value;
     let q2ans = document.getElementById("sq2-answer").value;
     let loginCredentials = [];
-    await callEncryption(passwordInputted, "loginUser");
+    let salt = await callEncryption(passwordInputted, "loginUser");
     let pIv = passwordToStoreEncryptIV;
     let pEnc = passwordToStoreEncrypt;
-    loginCredentials.push({websiteName:"loginUser", userName:usernameInputted, iv:pIv, encryptPass:pEnc, q1ans:q1ans, q2ans:q2ans});
+    loginCredentials.push({
+        websiteName:"loginUser", 
+        userName:usernameInputted, 
+        iv:pIv, 
+        encryptPass:pEnc, 
+        salt:salt, 
+        q1ans:q1ans, 
+        q2ans:q2ans});
     localStorage.setItem("loginUser", JSON.stringify(loginCredentials));
     document.getElementById("createAccount").style.display = "none";
     document.getElementById("loginWindow").style.display = "flex";
@@ -57,7 +58,14 @@ async function login() {
     var usernameInputted = document.getElementById("login-username").value;
     var passwordInputted = document.getElementById("login-password").value;
     var savedloginData = JSON.parse(localStorage.getItem("loginUser"))
-    let savedPasswordEncrypt = await callDecryption("loginUser") 
+    var salt = savedloginData[0].salt;
+    console.log(salt);
+    console.log(new Uint8Array(salt));
+    let savedPasswordEncrypt = await callDecryption("loginUser", new Uint8Array(salt));
+    if (savedloginData == null) {
+        alert("No user created, please create an account");
+        return;
+    }
     let savedUsername = savedloginData[0].userName;
     let usernameCorrect = false;
     let passwordCorrect = false;
@@ -69,9 +77,8 @@ async function login() {
     }
     if (usernameCorrect == true && passwordCorrect == true) {
         localStorage.setItem("loggedIn", "true");
-        document.getElementById("loginWindow").style.display = "none";
-        document.getElementById("mainContainer").style.display = "flex";
-        document.getElementById("menuRight").style.display = "flex";
+        window.location.href = "dashboard.html";
+
         displayPasswords();
     } else {
         alert("Either your username or password is incorrect, please try again");
@@ -80,9 +87,8 @@ async function login() {
 
 // Function used to log out the user by clearing the screen and showing the log in page
 function logout() {
-    localStorage.setItem("loggedIn", "false");
-    document.getElementById('loginWindow').style.display='flex';
-    document.getElementById('menuRight').style.display = 'none';
+    localStorage.removeItem("loggedIn");
+    window.location.href = "index.html";
 }
 
 // Function used if the user forgets their password, asking for the security question answers and setting a new password
@@ -175,8 +181,9 @@ async function savePassword() {
     var userName = document.getElementById("username").value;
     var passwordToStore = document.getElementById("password").value;
     credentialsToStore = [];
-    await callEncryption(passwordToStore, websiteName);
-    credentialsToStore.push({websiteName:websiteName, userName:userName, iv:passwordToStoreEncryptIV, encryptPass: passwordToStoreEncrypt});
+    var salt = await callEncryption(passwordToStore, websiteName);
+    alert(salt);
+    credentialsToStore.push({websiteName:websiteName, userName:userName, iv:passwordToStoreEncryptIV, encryptPass: passwordToStoreEncrypt, salt:salt});
     localStorage.setItem(websiteName, JSON.stringify(credentialsToStore));
     alert("Password Sucessfully Stored");
     displayPasswords();
@@ -250,9 +257,9 @@ function changeBGColour(colour) {
 }
 
 // Function to derive the key
-async function keyDeriveFromPassword(password) {
+async function keyDeriveFromPassword(password, salt) {
     const buffer = new TextEncoder().encode(password);
-    const salt = new TextEncoder().encode("mysalt");
+    const saltBuffer = new Uint8Array(salt);
     const keyDerive = await crypto.subtle.importKey(
         "raw",
         buffer,
@@ -264,7 +271,7 @@ async function keyDeriveFromPassword(password) {
     const key = await crypto.subtle.deriveKey(
         {
             name: "PBKDF2",
-            salt: salt,
+            salt: saltBuffer,
             iterations:10000,
             hash: "SHA-256"
         },
@@ -300,27 +307,48 @@ async function encryptAndStore(encryption_key, data_to_encrypt, websiteName) {
 // Function used to decrypt the data
 async function decryptFromStore(key, website) {
     try {
-        var encrypted_data_string = localStorage.getItem(website);
+        const encrypted_data_string = localStorage.getItem(website);
         if (!encrypted_data_string) {
-            throw new Error ("NO DATA");
+            throw new Error("No data found for the specified website.");
         }
-        var encrypted_data = JSON.parse(encrypted_data_string);
-        var ivDecrypt = new Uint8Array(encrypted_data[0].iv);
-        var encrypted_array = new Uint8Array(encrypted_data[0].encryptPass);
-        var decrypted_data = await crypto.subtle.decrypt(
+
+        const encrypted_data = JSON.parse(encrypted_data_string);
+
+        // Validate the structure of the stored data
+        if (
+            !Array.isArray(encrypted_data) ||
+            !encrypted_data[0] ||
+            typeof encrypted_data[0] !== "object" ||
+            !encrypted_data[0].iv ||
+            !encrypted_data[0].encryptPass ||
+            !encrypted_data[0].salt
+        ) {
+            throw new Error("Stored data is not in the expected format.");
+        }
+
+        // Convert stored values back to Uint8Array
+        const ivDecrypt = new Uint8Array(encrypted_data[0].iv);
+        const encrypted_array = new Uint8Array(encrypted_data[0].encryptPass);
+        const salt = new Uint8Array(encrypted_data[0].salt);
+        console.log(salt);
+
+        // Derive the key using the salt
+        const derivedKey = await keyDeriveFromPassword(website, salt);
+
+        // Decrypt the data
+        const decrypted_data = await crypto.subtle.decrypt(
             {
                 name: "AES-GCM",
                 iv: ivDecrypt,
             },
-            key,
+            derivedKey,
             encrypted_array
         );
 
-        const decoder = new TextDecoder();
-        let decodedData =  decoder.decode(decrypted_data);
-        return decodedData;
+        return new TextDecoder().decode(decrypted_data);
     } catch (error) {
-        console.error("ERROR OCCURED ", error);
+        console.error("Decryption failed:", error.message);
+        return null; // Return null on failure
     }
 }
 
@@ -328,13 +356,16 @@ async function decryptFromStore(key, website) {
 async function callEncryption(data, website) {
     var data = data;
     var website = website;
-    var key = await keyDeriveFromPassword(website);
+    const salt = window.crypto.getRandomValues(new Uint8Array(16));
+    var key= await keyDeriveFromPassword(website, salt);
     await encryptAndStore(key, data, website);
+    return Array.from(salt);
 }
 
-async function callDecryption(website) {
+async function callDecryption(website, salt) {
     var website = website;
-    var key = await keyDeriveFromPassword(website);
+    var salt = salt
+    var key = await keyDeriveFromPassword(website, salt);
     var decrypted_pass = await decryptFromStore(key, website);
     return decrypted_pass;
 }
@@ -366,7 +397,7 @@ async function getPasswords() {
                 passwordsList.push({
                     websiteName: dataParsed[0].websiteName,
                     userName: dataParsed[0].userName,
-                    password: await callDecryption(dataParsed[0].websiteName)
+                    password: await callDecryption(dataParsed[0].websiteName, dataParsed[0].salt),
                 });
             }
         } catch (error) {
