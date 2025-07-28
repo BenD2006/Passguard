@@ -7,6 +7,10 @@ var credentialsToStore = [];
 var passwordToStoreEncryptIV;
 var passwordToStoreEncrypt;
 
+document.addEventListener("DOMContentLoaded", () => {
+    displayPasswords();
+});
+
 // Function created to make the new account window and check if user account already exists
 function createAccountWindow() {
     if (localStorage.getItem("loginUser") != ''){

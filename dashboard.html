@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang='en'>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="styles.css">
     <title>Password Management System</title>
     <link rel="icon" href="favicon.ico" type="image/x-icon">
@@ -10,9 +11,9 @@
             checkLogin();
         };
 
-        window.onbeforeunload = function() {
-            localStorage.removeItem('loggedIn');
-        };
+        //window.onbeforeunload = function() {
+        //    localStorage.removeItem('loggedIn');
+        //};
     </script>
     <script src="script.js"></script>
 </head>
@@ -21,23 +22,23 @@
         <button id="savemodalclose" onclick="document.getElementById('editpasswordmodal').style.display = 'none'; document.getElementById('mainContainer').style.display='flex'" type="button">Close</button>
         <h2>Edit Password</h2>
         <form class="modal-content">
-            <div style="display: flex; flex-direction: column; align-items: center;">
+            <div style="display: flex; flex-direction: column;">
                 <label for="editwebpage">Website Name:</label>
-                <input type="text" id="editwebpage" name="editwebpage" style="width: 500px;"><br>
+                <input type="text" id="editwebpage" name="editwebpage" style="width: 400px;"><br>
 
                 <label for="editusername">Username/Email:</label>
-                <input type="text" id="editusername" name="editusername" style="width: 500px;"><br>
+                <input type="text" id="editusername" name="editusername" style="width: 400px;"><br>
 
                 <label for="editpassword">Password:</label>
-                <input type="password" id="editpassword" name="editpassword" style="width: 500px;"><br><br>
+                <input type="password" id="editpassword" name="editpassword" style="width: 400px;"><br><br>
 
-                <button onclick="editPassword()" type="button" style="height: 40px; width: 500px;">Submit</button>
+                <button onclick="editPassword()" type="button" style="height: 40px; width: 400px;">Submit</button>
             </div>
         </form>
     </div>
 
     <div id="mainContainer" class="responsive-container">
-        <h1>PassGuard</h1> 
+        <mainPageTitle>PassGuard</mainPageTitle> 
         <div id="menuRight">
             <button type="button" class="logoutbutton" onclick=logout()>Log Out</button>
             <button type="button" class="clearbutton" onclick=clearStorage()>Clear Storage</button>
@@ -60,7 +61,7 @@
         <div id="deletePasswordArea">
             <h3>Delete Password from Password Storage</h3>
             <form>
-                <label for="webpage">Webpage Name:</label> <br>
+                <label for="deletewebpage">Webpage Name:</label> <br>
                 <input type="text" id="deletewebpage" name="deletewebpage" value="" style="width: 580px; height:25px;" ><br><br>
                 <button onclick=deletePassword() type="button" style="height: 40px; width: 600px;">Delete</button>
             </form>
@@ -91,7 +92,7 @@
                 id="passwordCheck"
                 placeholder="Type your password here" />
             <button type="button" id="checkPasswordButton" onclick="checkPasswordStrength()">Check Password</button>
-            <label for="">
+            <label for="button">
                 Strength of password
             </label>
             <div class="power-container">
@@ -101,8 +102,8 @@
 
         <div id="generatePasswordArea">
             <h3>Password Generator</h3>
-            <p id="passwordgen" style="display:none;">Generated Password:</p>
-            <label for="numofchar">Characters:</label><input type="number" id="numofchar" style="height:10px; width:50px;" min="1" max="100">
+            <p id="passwordgen" style="display:none; margin-bottom: 0;">Generated Password:</p>
+            <label for="numofchar">Characters:</label><input type="number" id="numofchar" style="height:10px; width:50px;margin-top:0" min="8" max="100">
             <div>
             <div style="display: flex; flex-direction: column;">
                 <label>Lowercase<input type="checkbox" id="lchar" checked></label>
@@ -125,15 +126,15 @@
             <div id="searchResults"></div>
         </div>
 
-        <div id="settingsWindow" class="editModal" style="display:none">
-            <button id="savemodalclose" onclick="document.getElementById('settingsWindow').style.display = 'none'" type="button" >Close</button>
+        <div id="settingsWindow" class="editModal" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); z-index:1000; background-color:white; padding:20px; border:2px solid #ccc; box-shadow:0px 4px 6px rgba(0,0,0,0.1);">
+            <button id="savemodalclose" onclick="document.getElementById('settingsWindow').style.display = 'none'" type="button">Close</button>
             <h2>Settings Page</h2>
             <h3>Background Colour Menu</h3>
             <button onclick="changeBGColour('Blue')" style="width: 150px;">Blue</button>
             <button onclick="changeBGColour('red')" style="width: 150px;">Red</button>
             <button onclick="changeBGColour('green')" style="width: 150px;">Green</button>
             <button onclick="changeBGColour('white')" style="width: 150px;">White</button>
-            <button onclick="changeBGColour('#d0e0ff')"style="width: 150px;">Deafult</button>
+            <button onclick="changeBGColour('#d0e0ff')" style="width: 150px;">Default</button>
         </div>
         </div>
         </body>
