@@ -3,6 +3,10 @@ var credentialsToStore = [];
 var passwordToStoreEncryptIV;
 var passwordToStoreEncrypt;
 
+document.addEventListener("DOMContentLoaded", () => {
+    displayPasswords();
+});
+
 // --- Event Listeners ---
 window.onload = function() {
     // This is a placeholder for a real login check.
