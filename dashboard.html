@@ -1,55 +1,77 @@
 <!DOCTYPE html>
-<html lang='en'>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<html lang="en">
 <head>
-    <link rel="stylesheet" href="styles.css">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Password Management System</title>
     <link rel="icon" href="favicon.ico" type="image/x-icon">
-    <script>
-        window.onload = function() {
-            checkLogin();
-            
-        };
-
-        window.onbeforeunload = function() {
-            localStorage.removeItem('loggedIn');
-        };
-    </script>
-    <script src="script.js"></script>
+    <!-- Link to the external stylesheet -->
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <!-- Edit Password Modal -->
     <div id="editpasswordmodal" class="editmodal">
-        <form class="modal-content">
-            <div style="display: flex; flex-direction: column; align-items: center;">
-                <label for="editwebpage">Website Name:</label>
-                <input type="text" id="editwebpage" name="editwebpage" style="width: 500px;"><br>
-
-                <label for="editusername">Username/Email:</label>
-                <input type="text" id="editusername" name="editusername" style="width: 500px;"><br>
-
-                <label for="editpassword">Password:</label>
-                <input type="password" id="editpassword" name="editpassword" style="width: 500px;"><br><br>
-
-                <button onclick="editPassword()" type="button" style="height: 40px; width: 500px;">Submit</button>
+        <form class="modal-content" onsubmit="event.preventDefault(); editPassword();">
+            <h2>Edit Password</h2>
+            <div style="display: flex; flex-direction: column; gap: 15px;">
+                <div>
+                    <label for="editwebpage">Website Name:</label>
+                    <input type="text" id="editwebpage" name="editwebpage" readonly>
+                </div>
+                <div>
+                    <label for="editusername">Username/Email:</label>
+                    <input type="text" id="editusername" name="editusername">
+                </div>
+                <div>
+                    <label for="editpassword">New Password:</label>
+                    <input type="password" id="editpassword" name="editpassword" placeholder="Leave blank to keep current password">
+                </div>
+                <button type="submit">Submit Changes</button>
+                <button onclick="document.getElementById('editpasswordmodal').style.display = 'none'" type="button">Close</button>
             </div>
         </form>
     </div>
 
-    <div id="mainContainer" class="responsive-container">
+    <!-- Search Results Modal -->
+    <div id="searchResultsModal" class="searchResultsModal">
+        <div class="modal-content">
+            <h2>Search Results</h2>
+            <div id="searchResults"></div>
+            <button onclick="closeSearchResults()" type="button">Close</button>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settingsWindow" class="settingsModal">
+        <div class="modal-content">
+            <h2>Settings</h2>
+            <h3>Background Colour</h3>
+            <div style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;">
+                <button onclick="changeBGColour('blue')">Blue</button>
+                <button onclick="changeBGColour('red')">Red</button>
+                <button onclick="changeBGColour('green')">Green</button>
+                <button onclick="changeBGColour('white')">White</button>
+                <button onclick="changeBGColour('#d0e0ff')">Default</button>
+            </div>
+            <button onclick="document.getElementById('settingsWindow').style.display = 'none'" type="button" style="margin-top: 20px;">Close</button>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div id="mainContainer">
+        <!-- Reordered Header Elements -->
+        <div id="searchContainer">
+            <input type="text" id="passwordSearch" placeholder="Search passwords by website or username...">
+            <button onclick="searchPassword()">Search</button>
+        </div>
         <h1>PassGuard</h1> 
         <div id="menuRight">
             <button type="button" onclick="logout()">Log Out</button>
             <button type="button" onclick="clearStorage()">Clear Storage</button>
             <button type="button" onclick="document.getElementById('settingsWindow').style.display = 'flex'">Settings</button>
         </div>
-
-        <div id="searchContainer">
-            <input type="text" id="passwordSearch" placeholder="Search passwords by website or username...">
-            <button onclick="searchPassword()">Search</button>
-        </div>
         
-        <!-- NEW: Wrapper for the left column grid -->
+        <!-- Wrapper for the left column grid -->
         <div id="left-column">
             <div id="savePasswordArea">
                 <h3>Save New Password</h3>
@@ -68,15 +90,44 @@
                     </div>
                     <button type="submit">Submit</button>
                 </form>
-        </div>
-        
-        <div id="deletePasswordArea">
-            <h3>Delete Password from Password Storage</h3>
-            <form>
-                <label for="webpage">Webpage Name:</label> <br>
-                <input type="text" id="deletewebpage" name="deletewebpage" value="" style="width: 580px; height:25px;" ><br><br>
-                <button onclick=deletePassword() type="button" style="height: 40px; width: 600px;">Delete</button>
-            </form>
+            </div>
+            
+            <div id="deletePasswordArea">
+                <h3>Delete Password</h3>
+                <form onsubmit="event.preventDefault(); deletePassword();">
+                    <div>
+                        <label for="deletewebpage">Webpage Name:</label> 
+                        <input type="text" id="deletewebpage" name="deletewebpage" value="">
+                    </div>
+                    <button type="submit">Delete</button>
+                </form>
+            </div>
+
+            <div id="checkPasswordArea">
+                <h3>Password Strength Checker</h3>
+                <label for="passwordCheck">Enter Password to Check:</label>
+                <input type="text" id="passwordCheck" placeholder="Type your password here" oninput="checkPasswordStrength()">
+                <label>Strength:</label>
+                <div class="power-container">
+                    <div id="power-point"></div>
+                </div>
+            </div>
+
+            <div id="generatePasswordArea">
+                <h3>Password Generator</h3>
+                <div>
+                    <label for="numofchar">Characters (8-100):</label>
+                    <input type="number" id="numofchar" value="12" min="8" max="100">
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 5px; margin-top: 10px;">
+                    <label><input type="checkbox" id="lchar" checked> Lowercase</label>
+                    <label><input type="checkbox" id="uchar" checked> Uppercase</label>
+                    <label><input type="checkbox" id="num" checked> Numbers</label>
+                    <label><input type="checkbox" id="sym" checked> Symbols</label>
+                </div>
+                <button onclick="generatePassword()">Generate</button>
+                <p id="passwordgen" style="display:none; margin-top: 15px; font-weight: bold; text-align: center; word-break: break-all;"></p>
+            </div>
         </div>
 
         <div id="showPasswordArea">
@@ -95,60 +146,13 @@
                     <tbody id="passwordTableBody">
                         <!-- Password entries will be dynamically populated here -->
                     </tbody>
-                </table>                
+                </table>
+            </div>                
         </div>
+    </div>
 
-        <div id="checkPasswordArea" class="group">
-            <h3>Password Strength Checker</h3>
-            <label for="passwordCheck">Enter Password below:</label>
-            <input type="text" 
-                id="passwordCheck"
-                placeholder="Type your password here" />
-            <button type="button" id="checkPasswordButton" onclick="checkPasswordStrength()">Check Password</button>
-            <label for="">
-                Strength of password
-            </label>
-            <div class="power-container">
-                <div id="power-point"></div>
-            </div>
-        </div>
+    <!-- Link to the external JavaScript file -->
+    <script src="script.js"></script>
+</body>
+</html>
 
-        <div id="generatePasswordArea">
-            <h3>Password Generator</h3>
-            <p id="passwordgen" style="display:none;">Generated Password:</p>
-            <label for="numofchar">Characters:</label><input type="number" id="numofchar" style="height:10px; width:50px;" min="1" max="100">
-            <div>
-            <div style="display: flex; flex-direction: column;">
-                <label>Lowercase<input type="checkbox" id="lchar" checked></label>
-                <label>Uppercase<input type="checkbox" id="uchar" checked></label>
-                <label>Numbers<input type="checkbox" id="num" checked></label>
-                <label>Symbols<input type="checkbox" id="sym" checked></label>
-            </div>
-            </div>
-            <button onclick="generatePassword()" style="width: 100%;">Generate</button>
-        </div>
-
-        <div id="searchContainer">
-            <input type="text" id="passwordSearch" placeholder="Search passwords...">
-            <button class="searchbutton" onclick="searchPassword()">Search</button>
-        </div>
-        
-        <div id="searchResultsModal" class="searchResultsModal" style="display: none;">
-            <button onclick="closeSearchResults()" type="button">Close</button>
-            <h2>Search Results</h2>
-            <div id="searchResults"></div>
-        </div>
-
-        <div id="settingsWindow" class="editModal" style="display:none">
-            <button id="savemodalclose" onclick="document.getElementById('settingsWindow').style.display = 'none'" type="button" >Close</button>
-            <h2>Settings Page</h2>
-            <h3>Background Colour Menu</h3>
-            <button onclick="changeBGColour('Blue')" style="width: 150px;">Blue</button>
-            <button onclick="changeBGColour('red')" style="width: 150px;">Red</button>
-            <button onclick="changeBGColour('green')" style="width: 150px;">Green</button>
-            <button onclick="changeBGColour('white')" style="width: 150px;">White</button>
-            <button onclick="changeBGColour('#d0e0ff')"style="width: 150px;">Deafult</button>
-        </div>
-        </div>
-        </body>
-        </html>

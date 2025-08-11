@@ -13,7 +13,6 @@ p, a, c  {
     color: black;
     text-align: center;
 }
-
     
 h1, h2, h3 {
     text-align: center;
@@ -26,51 +25,52 @@ h1, h2, h3 {
     flex-wrap: wrap; 
     gap: 20px; 
     padding: 20px;
-    align-items: stretch; /* Makes direct children (the columns) equal height */
+    align-items: stretch;
 }
 
 /* --- Header Section --- */
-.mainPageTitle {
-    order: 1;
-    flex-basis: calc(50% - 10px);
-}
-#menuRight {
-    order: 2;
-    display: flex;
-    gap: 10px;
-    justify-content: flex-end;
-    align-items: center;
-    flex-basis: calc(50% - 10px);
-}
 #searchContainer {
-    order: 3;
-    width: 100%;
+    order: 1;
+    flex: 1 1 250px; /* Flex-grow, shrink, basis */
     display: flex;
-    gap: 10px;
     align-items: center;
-    background-color: transparent;
+    gap: 10px;
 }
 #passwordSearch {
     flex-grow: 1;
 }
 
-/* --- Two-Column Content Section --- */
+#mainContainer > h1 {
+    order: 2;
+    flex: 2 1 auto; /* Title takes up more space */
+    text-align: center;
+    margin: 0;
+    align-self: center;
+}
 
-/* Wrapper for the left side grid */
+#menuRight {
+    order: 3;
+    flex: 1 1 250px; /* Same basis as search for balance */
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+/* --- Two-Column Content Section --- */
 #left-column {
     order: 4;
     display: flex;
     flex-wrap: wrap;
     align-content: flex-start;
     gap: 20px;
-    flex: 3 1 60%; /* flex-grow, flex-shrink, flex-basis */
+    flex: 3 1 60%; 
     min-width: 350px;
 }
 
-/* The password table on the right */
 #showPasswordArea {
     order: 5;
-    flex: 2 1 35%; /* Takes up ~40% of the space */
+    flex: 2 1 35%; 
     min-width: 300px;
     display: flex;
     flex-direction: column;
@@ -94,31 +94,46 @@ h1, h2, h3 {
 #deletePasswordArea,
 #checkPasswordArea,
 #generatePasswordArea {
-    /* Each item takes roughly 50% of the left column's width, minus gap */
     flex: 1 1 calc(50% - 10px);
-    min-width: 250px; /* Prevent them from getting too squished before wrapping */
+    min-width: 250px; 
     display: flex;
     flex-direction: column;
     gap: 15px;
 }
 
 /* --- Media Queries for Responsiveness --- */
-
-/* For tablets and smaller desktops, stack the main columns */
 @media (max-width: 1200px) {
     #left-column, #showPasswordArea {
-        flex-basis: 100%; /* Stack the main columns */
+        flex-basis: 100%; 
     }
 }
 
-/* For mobile phones, stack everything */
 @media (max-width: 768px) {
-    .mainPageTitle, #menuRight {
+    #mainContainer > h1 {
+        order: 1; /* Title first on mobile */
         flex-basis: 100%;
-        text-align: center;
+    }
+    #searchContainer {
+        order: 2;
+        flex-basis: 100%;
+    }
+    #menuRight {
+        order: 3;
+        flex-basis: 100%;
+        justify-content: center;
+    }
+    #savePasswordArea,
+    #deletePasswordArea,
+    #checkPasswordArea,
+    #generatePasswordArea {
+        flex-basis: 100%; 
+        min-width: 0;
+    }
 }
 
-input {
+/* --- General Element Styling --- */
+input[type="text"], input[type="password"], input[type="number"] {
+    width: 100%; 
     padding: 10px;
     margin-top: 5px;
     border-radius: 20px;
@@ -136,14 +151,21 @@ label {
 }
 
 button {
-    background: rgba(0, 132, 255, 0.781);
-    color: white;
-    padding: 10px;
+    background:#c4ffcb;
+    color: black;
+    padding: 10px 15px;
     border: none;
     border-radius: 20px;
     cursor: pointer;
     margin-top: 10px;
+    width: auto;
+    min-width: 120px;
+}
+#left-column button, #showPasswordArea button, #searchContainer button {
     width: 100%; 
+}
+#menuRight button {
+    width: auto;
 }
 
 button:hover {
@@ -166,82 +188,16 @@ button:hover {
     background-color: rgba(0, 0, 0, 0.5);
 }
 
-.editmodal {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: fixed;
-    z-index: 1;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    width: 50%;
-    height: 60%;
-    overflow: auto;
-    background-color: white;
-}
-
-.searchResultsModal {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 300px;
-    padding: 20px;
-    background: white;
-    border-radius: 10px;
-}
-
 .modal-content {
-    margin: 0;
-    width: 40%;
+    background-color: white;
+    padding: 30px;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 500px;
     text-align: center;
-    padding-bottom: 20px;
-
 }
 
-.logoutbutton {
-    position:absolute;
-    top:0px;
-    right:30px;
-    width: 150px;
-}
-.clearbutton {
-    position:absolute;
-    top:40px;
-    right:30px;
-    width: 150px;
-}
-
-.settingsbutton {
-    position:absolute;
-    top:80px;
-    right:30px;
-    width: 150px;
-}
-
-#searchContainer {
-    position: absolute;
-    top: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 300px;
-}
-
-#passwordSearch {
-    width: 100%;
-    padding: 10px;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-}
-
-
-
-
+/* --- Table Styling --- */
 #passwordTable {
     width: 100%; 
     border-collapse: collapse;
