@@ -3,20 +3,18 @@ var credentialsToStore = [];
 var passwordToStoreEncryptIV;
 var passwordToStoreEncrypt;
 
+// --- Event Listeners ---
 document.addEventListener("DOMContentLoaded", () => {
     displayPasswords();
 });
 
-// --- Event Listeners ---
 window.onload = function() {
-    // This is a placeholder for a real login check.
     // In a real app, you'd check a secure token, not just a localStorage item.
     // For this demo, we assume the user is "logged in" to see the dashboard.
-    // checkLogin(); 
+    checkLogin(); 
     displayPasswords();
 };
 
-// This would log a user out if they close the tab.
 window.onbeforeunload = function(event) {
     if (!event || event.type === "unload") {
         // In a real app, you might not want to automatically log out.
@@ -24,20 +22,130 @@ window.onbeforeunload = function(event) {
     }
 };
 
-
 // --- Core Functions ---
+
+// Function created to make the new account window and check if user account already exists
+function createAccountWindow() {
+    if (localStorage.getItem("loginUser") != ''){
+        document.getElementById("createAccount").style.display = "flex";
+    } else {
+        alert("User already created");
+    }
+}
 
 function checkLogin() {
     const LoggedIn = localStorage.getItem('loggedIn');
     if (LoggedIn === null) {
-        // window.location.href = "index.html";
+        // In a real app, this would redirect to the login page.
+        // For this demo, we'll just log to the console.
         console.log("User not logged in. Redirect would happen here.");
+        // window.location.href = "index.html";
+    }
+}
+
+// Asynchronous function used to create a new account and get all data from the user, then stores to local storage.
+async function createAccount() {
+    document.getElementById("loginWindow").style.display = "none";
+    let usernameInputted = document.getElementById("login-username-new").value;
+    let passwordInputted = document.getElementById("login-password-new").value;
+    if (passwordInputted.length < 8) {
+        alert("Password Doesn't Meet Requirements");
+        document.getElementById("loginWindow").style.display = "flex";
+        return;
+       
+    }
+    let q1ans = document.getElementById("sq1-answer").value;
+    let q2ans = document.getElementById("sq2-answer").value;
+    let loginCredentials = [];
+    let salt = await callEncryption(passwordInputted, "loginUser");
+    let pIv = passwordToStoreEncryptIV;
+    let pEnc = passwordToStoreEncrypt;
+    loginCredentials.push({
+        websiteName:"loginUser", 
+        userName:usernameInputted, 
+        iv:pIv, 
+        encryptPass:pEnc, 
+        salt:salt, 
+        q1ans:q1ans, 
+        q2ans:q2ans});
+    localStorage.setItem("loginUser", JSON.stringify(loginCredentials));
+    document.getElementById("createAccount").style.display = "none";
+    document.getElementById("loginWindow").style.display = "flex";
+}
+
+// Function used to authenticate the user into the site using the entered username and password, and the local storage data.
+async function login() {
+    var usernameInputted = document.getElementById("login-username").value;
+    var passwordInputted = document.getElementById("login-password").value;
+    var savedloginData = JSON.parse(localStorage.getItem("loginUser"))
+    if (savedloginData == null) {
+        alert("No user created, please create an account");
+        return;
+    }
+    var salt = savedloginData[0].salt;
+    let savedPasswordEncrypt = await callDecryption("loginUser", new Uint8Array(salt));
+    
+    let savedUsername = savedloginData[0].userName;
+    let usernameCorrect = false;
+    let passwordCorrect = false;
+
+    if (usernameInputted === savedUsername) {
+        usernameCorrect = true;
+    }
+    if (passwordInputted === savedPasswordEncrypt) {
+        passwordCorrect = true;
+    }
+    if (usernameCorrect == true && passwordCorrect == true) {
+        localStorage.setItem("loggedIn", "true");
+        window.location.href = "dashboard.html";
+    } else {
+        alert("Either your username or password is incorrect, please try again");
     }
 }
 
 function logout() {
     localStorage.removeItem("loggedIn");
     window.location.href = "index.html";
+}
+
+// Function used if the user forgets their password, asking for the security question answers and setting a new password
+function forgotPassword() {
+    let resetFlag = false;
+    let q1ansNew = document.getElementById("sq1-answer-fg").value;
+    let q2ansNew = document.getElementById("sq2-answer-fg").value;
+    let credentials = localStorage.getItem("loginUser");
+    if (credentials == null) {
+        alert("No user created");
+        document.getElementById("forgotpassword").style.display = "none";
+        return;
+    }
+    let unstringCredentials = JSON.parse(credentials);
+    let q1ans = unstringCredentials[0].q1ans;
+    let q2ans = unstringCredentials[0].q2ans;
+    if (q1ansNew == q1ans && q2ansNew == q2ans) {
+        resetFlag = true;
+    } else {
+        alert("Wrong answers provided");
+    }
+    if (resetFlag == true) {
+        document.getElementById("questions").style.display = "none";
+        document.getElementById("passreset").style.display = "flex";
+    }
+}
+
+// Function called using the reset password function to create a new password for the account
+async function newPassword() {
+    let passwordInputtedNew = document.getElementById("newPass").value;
+    let credentials = localStorage.getItem("loginUser");
+    let unstringCredentials = JSON.parse(credentials);
+    const newSalt = await callEncryption(passwordInputtedNew,"loginUser");
+    unstringCredentials[0].iv = passwordToStoreEncryptIV;
+    unstringCredentials[0].encryptPass =  passwordToStoreEncrypt;
+    unstringCredentials[0].salt = newSalt;
+    localStorage.setItem("loginUser", JSON.stringify(unstringCredentials));
+    document.getElementById("passreset").style.display = "none";
+    document.getElementById("loginWindow").style.display = "flex";
+    document.getElementById("forgotpassword").style.display = "none";
 }
 
 function generatePassword() {
@@ -142,7 +250,6 @@ async function editPassword() {
 
     // Only re-encrypt if the password has changed
     if (passwordEdit) {
-         // *** FIX: A new salt must be generated and stored when the password changes ***
          const newSalt = await callEncryption(passwordEdit, websiteName);
          passwordStoredUnstring[0].iv = passwordToStoreEncryptIV;
          passwordStoredUnstring[0].encryptPass = passwordToStoreEncrypt;
@@ -216,7 +323,6 @@ async function displayPasswords() {
             document.getElementById("editpasswordmodal").style.display = "flex";
             document.getElementById("editwebpage").value = password.websiteName;
             document.getElementById("editusername").value = password.userName;
-            // Leave password blank for security, user must re-type to change.
             document.getElementById("editpassword").value = ""; 
             document.getElementById("editpassword").placeholder = "Enter new password (optional)";
         });
@@ -294,9 +400,7 @@ function checkPasswordStrength() {
     power.style.backgroundColor = colorPower[point] || "#D73F40";
 }
 
-// --- Encryption/Decryption Functions (Simplified for Demo) ---
-// NOTE: Web Crypto API is complex. This is a simplified implementation.
-// In a real-world scenario, robust error handling and key management are critical.
+// --- Encryption/Decryption Functions ---
 
 async function keyDeriveFromPassword(password, salt) {
     const encoder = new TextEncoder();
@@ -335,8 +439,6 @@ async function decryptFromStore(key, iv, encrypted_data) {
 
 async function callEncryption(data, website) {
     const salt = window.crypto.getRandomValues(new Uint8Array(16));
-    // Using the website name as part of the password for key derivation is not standard.
-    // A better approach would be to use a master password. For this demo, we'll use the website name.
     const key = await keyDeriveFromPassword(website, salt);
     await encryptAndStore(key, data);
     return Array.from(salt);
@@ -347,6 +449,11 @@ async function callDecryption(website, saltArray) {
     const key = await keyDeriveFromPassword(website, salt);
     
     const encrypted_data_string = localStorage.getItem(website);
+    if (!encrypted_data_string) {
+        console.error("No data found for website:", website);
+        return "NO DATA";
+    }
+    
     const encrypted_data = JSON.parse(encrypted_data_string);
     const iv = new Uint8Array(encrypted_data[0].iv);
     const encrypted_array = new Uint8Array(encrypted_data[0].encryptPass);
