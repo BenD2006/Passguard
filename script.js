@@ -17,6 +17,7 @@ function createAccountWindow() {
 }
 
 function checkLogin() {
+    
     const LoggedIn = localStorage.getItem('loggedIn');
     if (LoggedIn === null) {
         window.location.href = "index.html";
