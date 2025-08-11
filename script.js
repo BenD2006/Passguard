@@ -27,8 +27,6 @@ window.onbeforeunload = function(event) {
 // --- Core Functions ---
 
 function checkLogin() {
-    // This function is for the login page (index.html), not the dashboard.
-    // In a real multi-page app, you'd have separate JS files.
     const LoggedIn = localStorage.getItem('loggedIn');
     if (LoggedIn === null) {
         // window.location.href = "index.html";
