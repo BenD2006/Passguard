@@ -24,6 +24,7 @@ window.onbeforeunload = function(event) {
     }
 };
 
+
 // --- Core Functions ---
 
 function checkLogin() {
