@@ -1,22 +1,149 @@
 * {
-    font-family: "Tahoma";
+    font-family: "Tahoma", Arial, sans-serif;
+    box-sizing: border-box; 
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    background-color: #d0e0ff; 
 }
 
 p, a, c  {
     color: black;
     text-align: center;
 }
-    
-h1, h2, h3 {
-        text-align: center;
+
+.mainPageTitle {
+    text-align: left;
+    font-size: 2em;
+    color: black;
+    padding: 0;
+    margin: 0;
 }
 
-input {
+h1, h2, h3 {
+    text-align: center;
+    margin-top: 0;
+}
+
+/* --- Main Responsive Layout --- */
+#mainContainer {
+    display: flex;
+    flex-wrap: wrap; 
+    gap: 20px; 
+    padding: 20px;
+    align-items: stretch; /* Makes direct children (the columns) equal height */
+}
+
+/* --- Header Section --- */
+.mainPageTitle {
+    order: 1;
+    flex-basis: calc(50% - 10px);
+}
+#menuRight {
+    order: 2;
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    align-items: center;
+    flex-basis: calc(50% - 10px);
+}
+#searchContainer {
+    order: 3;
+    width: 100%;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    background-color: transparent;
+}
+#passwordSearch {
+    flex-grow: 1;
+}
+
+/* --- Two-Column Content Section --- */
+
+/* Wrapper for the left side grid */
+#left-column {
+    order: 4;
+    display: flex;
+    flex-wrap: wrap;
+    align-content: flex-start;
+    gap: 20px;
+    flex: 3 1 60%; /* flex-grow, flex-shrink, flex-basis */
+    min-width: 350px;
+}
+
+/* The password table on the right */
+#showPasswordArea {
+    order: 5;
+    flex: 2 1 35%; /* Takes up ~40% of the space */
+    min-width: 300px;
+    display: flex;
+    flex-direction: column;
+}
+
+/* --- Styling for all content panels --- */
+#savePasswordArea,
+#deletePasswordArea,
+#checkPasswordArea,
+#generatePasswordArea,
+#showPasswordArea {
+    padding: 20px;
+    border: 1px solid #ddd;
+    background-color: #ffffff;
+    border-radius: 15px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+/* Grid items within the left column */
+#savePasswordArea,
+#deletePasswordArea,
+#checkPasswordArea,
+#generatePasswordArea {
+    /* Each item takes roughly 50% of the left column's width, minus gap */
+    flex: 1 1 calc(50% - 10px);
+    min-width: 250px; /* Prevent them from getting too squished before wrapping */
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+/* --- Media Queries for Responsiveness --- */
+
+/* For tablets and smaller desktops, stack the main columns */
+@media (max-width: 1200px) {
+    #left-column, #showPasswordArea {
+        flex-basis: 100%; /* Stack the main columns */
+    }
+}
+
+/* For mobile phones, stack everything */
+@media (max-width: 768px) {
+    .mainPageTitle, #menuRight {
+        flex-basis: 100%;
+        text-align: center;
+        justify-content: center;
+    }
+
+    #savePasswordArea,
+    #deletePasswordArea,
+    #checkPasswordArea,
+    #generatePasswordArea {
+        flex-basis: 100%; /* Stack the grid items */
+        min-width: 0;
+    }
+}
+
+
+/* --- General Element Styling --- */
+input[type="text"], input[type="password"], input[type="number"] {
+    width: 100%; 
     padding: 10px;
-    margin-top: 25px;
-    border-radius: 30px;
+    margin-top: 5px;
+    border-radius: 20px;
     background: transparent;
-    border: 0.5px solid rgba(0, 132, 255, 0.781);
+    border: 1px solid rgba(0, 132, 255, 0.781);
     color: #000;
     font-size: 15px;
 }
@@ -25,16 +152,18 @@ label {
     font-size: 1.1em;
     color: black;
     text-align: left;
+    margin-bottom: 5px;
 }
 
 button {
-    background: rgba(0, 132, 255, 0.781);
-    color: white;
-    padding: 10px;
+    background:#c4ffcb;
+    color: black;
+    padding: 10px 15px;
     border: none;
-    border-radius: 30px;
+    border-radius: 20px;
     cursor: pointer;
-    margin-top: 15px;
+    margin-top: 10px;
+    width: 100%; 
 }
 
 button:hover {
@@ -43,216 +172,57 @@ button:hover {
     outline: 1px solid rgba(0, 132, 255, 0.781);
 }
 
-.modal {
-    display: flex;
+/* --- Modal Styling --- */
+.modal, .editmodal, .searchResultsModal, .settingsModal {
+    display: none; 
     justify-content: center;
     align-items: center;
     position: fixed;
-    z-index: 1;
+    z-index: 1000;
     left: 0;
     top: 0;
     width: 100%;
     height: 100%;
-    overflow: auto;
-    background-color: white;
-}
-
-.editmodal {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: fixed;
-    z-index: 1;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    width: 50%;
-    height: 60%;
-    overflow: auto;
-    background-color: white;
-}
-
-.searchResultsModal {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 300px;
-    padding: 20px;
-    background: white;
-    border-radius: 10px;
+    background-color: rgba(0, 0, 0, 0.5);
 }
 
 .modal-content {
-    margin: 0;
-    width: 40%;
-    text-align: center;
-    padding-bottom: 20px;
-
-}
-
-.logoutbutton {
-    position:absolute;
-    top:0px;
-    right:30px;
-    width: 150px;
-}
-.clearbutton {
-    position:absolute;
-    top:40px;
-    right:30px;
-    width: 150px;
-}
-
-.settingsbutton {
-    position:absolute;
-    top:80px;
-    right:30px;
-    width: 150px;
-}
-
-#searchContainer {
-    position: absolute;
-    top: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 300px;
-}
-
-#passwordSearch {
-    width: 100%;
-    padding: 10px;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-}
-
-
-
-
-#passwordTable {
-    width: 500px;
-    border-collapse: collapse;
+    background-color: white;
+    padding: 30px;
     border-radius: 10px;
-    overflow: hidden;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+    width: 90%;
+    max-width: 500px;
+    text-align: center;
+}
+
+/* --- Table Styling --- */
+#passwordTable {
+    width: 100%; 
+    border-collapse: collapse;
 }
 
 #passwordTable th {
-    background-color: #007BFF; /* Blue header */
+    background-color: #007BFF;
     color: white;
     padding: 12px;
     font-size: 16px;
-    border: 2px solid #0056b3;
 }
 
 #passwordTable td {
     padding: 10px;
     text-align: center;
-    border: 2px solid #007BFF;
+    border: 1px solid #ddd;
     font-size: 14px;
 }
 
 #passwordTable tbody tr:hover {
-    background-color: #ffeb99; /* Light yellow on hover */
+    background-color: #ffeb99;
     cursor: pointer;
 }
 
-.searchbutton {
-    position:absolute;
-    top:12px;
-    right:-200px;
-    width: 150px;
-}
-
-#savePasswordArea {
-    position: absolute;
-    top: 142px;
-    left: 1%;
-    border: #000 solid 1px;
-    background-color: #ffffff;
-    overflow:auto;
-    width: 32%; /* Ensures the border wraps tightly around the content */
-    height: fit-content; /* Optional: Ensures height adjusts to content */
-    padding: 10px;
-    padding-right: 30px;
-    border-radius: 30px;
-}
-
-#deletePasswordArea {
-    position: absolute;
-    overflow:auto;
-    width: 32%;
-    top: 631px; /* Adjusted to move it below the save area */
-    left: 1%;
-    background-color: #ffffff;
-    border:#000 solid 1px;
-    padding: 10px;
-    padding-right: 30px;
-    border-radius: 30px;
-}
-
-#showPasswordArea {
-    width: 25%;
-    overflow:auto;
-    height: 673px; /* Matches the bottom border of the generate password area */
-    border: #000 solid 1px;
-    background-color: #ffffff;
-    border-radius: 30px;
-    padding: 30px;
-    right:1%; 
-    position: absolute; 
-    top: 142px;
-}
-
-#generatePasswordArea {
-    width: 30%;
-    overflow:auto;
-    height:340px;
-    right:31.5%; 
-    position: absolute; 
-    top: 515px;
-    border: #000 solid 1px;
-    background-color: #ffffff;
-    border-radius: 30px;
-    padding: 10px;
-}
-
-
-#checkPasswordArea {
-    width:30%;
-    right:31.5%;
-    overflow:auto;
-    position: absolute;
-    top: 142px;
-    height:340px;
-    border: #000 solid 1px;
-    background-color: #ffffff;
-    border-radius: 30px;
-    padding: 10px;
-}
-
-#checkPasswordArea label {
-    display: block;
-    padding: 20px 0;
-}
-
-#checkPasswordArea input {
-    border: none;
-    outline: none;
-    padding: 20px;
-    width: calc(100% - 40px);
-    border-radius: 10px;
-    background-color: #eaeff2;
-    color: #3ba62f;
-    font-size: 20px;
-}
-
+/* --- Password Strength Checker --- */
 #checkPasswordArea .power-container {
-    background-color: #2E424D;
+    background-color: #e0e0e0;
     width: 100%;
     height: 15px;
     border-radius: 5px;
@@ -263,6 +233,5 @@ button:hover {
     width: 1%;
     height: 100%;
     border-radius: 5px;
-    transition: 1s;
+    transition: width 0.5s, background-color 0.5s;
 }
-
