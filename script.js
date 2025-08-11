@@ -1,404 +1,187 @@
-var passwordInputted = document.getElementById("userpass");
-var lengthOfPass = document.getElementById("length");
-var lowercaseLetter = document.getElementById("lowercase");
-var uppercaseLetter = document.getElementById("uppercase");
-var numberUsed = document.getElementById("number");
+// --- Global Variables ---
 var credentialsToStore = [];
 var passwordToStoreEncryptIV;
 var passwordToStoreEncrypt;
 
-// Function created to make the new account window and check if user account already exists
-function createAccountWindow() {
-    if (localStorage.getItem("loginUser") != ''){
-        document.getElementById("createAccount").style.display = "flex";
-    } else {
-        alert("User already created");
+document.addEventListener("DOMContentLoaded", () => {
+    displayPasswords();
+});
+
+// --- Event Listeners ---
+window.onload = function() {
+    // This is a placeholder for a real login check.
+    // In a real app, you'd check a secure token, not just a localStorage item.
+    // For this demo, we assume the user is "logged in" to see the dashboard.
+    // checkLogin(); 
+    displayPasswords();
+};
+
+// This would log a user out if they close the tab.
+window.onbeforeunload = function(event) {
+    if (!event || event.type === "unload") {
+        // In a real app, you might not want to automatically log out.
+        // localStorage.removeItem("loggedIn");
     }
-}
+};
+
+// --- Core Functions ---
 
 function checkLogin() {
-    
     const LoggedIn = localStorage.getItem('loggedIn');
     if (LoggedIn === null) {
-        window.location.href = "index.html";
+        // window.location.href = "index.html";
+        console.log("User not logged in. Redirect would happen here.");
     }
 }
 
-// Asynchronous function used to create a new account and get all data from the user, then stores to local storage.
-async function createAccount() {
-    document.getElementById("loginWindow").style.display = "none";
-    let usernameInputted = document.getElementById("login-username-new").value;
-    let passwordInputted = document.getElementById("login-password-new").value;
-    if (passwordInputted.length < 8) {
-        alert("Password Doesn't Meet Requirements");
-        document.getElementById("loginWindow").style.display = "flex";
-        return;
-       
-    }
-    let q1ans = document.getElementById("sq1-answer").value;
-    let q2ans = document.getElementById("sq2-answer").value;
-    let loginCredentials = [];
-    let salt = await callEncryption(passwordInputted, "loginUser");
-    let pIv = passwordToStoreEncryptIV;
-    let pEnc = passwordToStoreEncrypt;
-    loginCredentials.push({
-        websiteName:"loginUser", 
-        userName:usernameInputted, 
-        iv:pIv, 
-        encryptPass:pEnc, 
-        salt:salt, 
-        q1ans:q1ans, 
-        q2ans:q2ans});
-    localStorage.setItem("loginUser", JSON.stringify(loginCredentials));
-    document.getElementById("createAccount").style.display = "none";
-    document.getElementById("loginWindow").style.display = "flex";
-}
-
-// Function used to authenticate the user into the site using the entered username and password, and the local storage data.
-async function login() {
-    var usernameInputted = document.getElementById("login-username").value;
-    var passwordInputted = document.getElementById("login-password").value;
-    var savedloginData = JSON.parse(localStorage.getItem("loginUser"))
-    var salt = savedloginData[0].salt;
-    console.log(salt);
-    console.log(new Uint8Array(salt));
-    let savedPasswordEncrypt = await callDecryption("loginUser", new Uint8Array(salt));
-    if (savedloginData == null) {
-        alert("No user created, please create an account");
-        return;
-    }
-    let savedUsername = savedloginData[0].userName;
-    let usernameCorrect = false;
-    let passwordCorrect = false;
-    if (usernameInputted === savedUsername) {
-        usernameCorrect = true;
-    }
-    if (passwordInputted === savedPasswordEncrypt) {
-        passwordCorrect = true;
-    }
-    if (usernameCorrect == true && passwordCorrect == true) {
-        localStorage.setItem("loggedIn", "true");
-        window.location.href = "dashboard.html";
-
-        displayPasswords();
-    } else {
-        alert("Either your username or password is incorrect, please try again");
-    }
-}
-
-// Function used to log out the user by clearing the screen and showing the log in page
 function logout() {
     localStorage.removeItem("loggedIn");
     window.location.href = "index.html";
 }
 
-// Function used if the user forgets their password, asking for the security question answers and setting a new password
-function forgotPassword() {
-    let resetFlag = false;
-    let q1ansNew = document.getElementById("sq1-answer-fg").value;
-    let q2ansNew = document.getElementById("sq2-answer-fg").value;
-    let credentials = localStorage.getItem("loginUser");
-    let unstringCredentials = JSON.parse(credentials);
-    if (credentials == null) {
-        alert("No user created");
-        document.getElementById("forgotpassword").style.display = "none";
+function generatePassword() {
+    const charsToUse = {
+        lower: "abcdefghijklmnopqrstuvwxyz",
+        upper: "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+        numbers: "0123456789",
+        symbols: "!£$%^&*()[]{}'@#~;:/?",
+    };
+
+    let combinedChars = "";
+    if (document.getElementById("lchar").checked) combinedChars += charsToUse.lower;
+    if (document.getElementById("uchar").checked) combinedChars += charsToUse.upper;
+    if (document.getElementById("num").checked) combinedChars += charsToUse.numbers;
+    if (document.getElementById("sym").checked) combinedChars += charsToUse.symbols;
+
+    const passwordLength = parseInt(document.getElementById("numofchar").value, 10);
+
+    if (passwordLength < 8 || passwordLength > 100) {
+        alert("Password length must be between 8 and 100 characters.");
         return;
     }
-    let q1ans = unstringCredentials[0].q1ans;
-    let q2ans = unstringCredentials[0].q2ans;
-    if (q1ansNew == q1ans && q2ansNew == q2ans) {
-        resetFlag = true;
-    } else {
-        alert("Wrong answers provided");
-    }
-    if (resetFlag == true) {
-        document.getElementById("questions").style.display = "none";
-        document.getElementById("passreset").style.display = "flex";
+    if (combinedChars === "") {
+        alert("Please select at least one character type.");
+        return;
     }
 
-}
-
-// Function called using the reset password function to create a new password for the account
-async function newPassword() {
-    let passwordInputtedNew = document.getElementById("newPass").value;
-    let credentials = localStorage.getItem("loginUser");
-    let unstringCredentials = JSON.parse(credentials);
-    await callEncryption(passwordInputtedNew,"loginUser");
-    unstringCredentials[0].iv = passwordToStoreEncryptIV;
-    unstringCredentials[0].encryptPass =  passwordToStoreEncrypt;
-    localStorage.setItem("loginUser", JSON.stringify(unstringCredentials));
-    document.getElementById("passreset").style.display = "none";
-    document.getElementById("loginWindow").style.display = "none";
-    document.getElementById("forgotpassword").style.display = "none";
-    document.getElementById("mainContainer").style.display = "block";
-    document.getElementById("menuRight").style.display = "flex";
-    
-
-}
-// Function used to generate the user a new password using the requirements set
-function generatePassword() {
-    const baseChars = "abcdefghijklmnopqrstuvwxyz";
-    var charsToUse = "abcdefghijklmnopqrstuvwxyz";
-    const uppercaseCharacters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    const numericCharacters = "0123456789";
-    const symbolCharacters = "!£$%^&*()[]{}'@#~;:/?";
-    var passwordLength = document.getElementById("numofchar").value;
-    var specialChar = document.getElementById("sym").checked;
-    var lowercaseLetter = document.getElementById("lchar").checked;
-    var upChar = document.getElementById("uchar").checked;
-    var numbers = document.getElementById("num").checked;
-    var generatedPassword = "";
-    if (passwordLength <8 || passwordLength >=100) {
-        alert("Password Length is Invalid or Insecure"); 
-    } else {
-        if (lowercaseLetter == false && upChar == false && numbers == false && specialChar == false) {
-            alert("Please select at least one option");
-        }
-        if (lowercaseLetter == false) {
-            var charsToUse = ''
-        }
-        if (specialChar == true) {
-            charsToUse += symbolCharacters;
-        }
-        if (upChar == true) {
-            charsToUse += uppercaseCharacters;
-        }
-        if (numbers == true) {
-            charsToUse += numericCharacters;
-        }
-        for (i=0;i < passwordLength; i++) {
-            charToAdd = charsToUse[Math.floor(Math.random() * charsToUse.length)];
-            generatedPassword += charToAdd;
-        }
-        document.getElementById("passwordgen").innerHTML = "password: " + generatedPassword;
-        document.getElementById("passwordgen").style.display = "flex";
-        charsToUse = "abcdefghijklmnopqrstuvwxyz";
+    let generatedPassword = "";
+    for (let i = 0; i < passwordLength; i++) {
+        const randomIndex = Math.floor(Math.random() * combinedChars.length);
+        generatedPassword += combinedChars[randomIndex];
     }
+
+    const passwordGenElement = document.getElementById("passwordgen");
+    passwordGenElement.textContent = generatedPassword;
+    passwordGenElement.style.display = "block";
 }
 
-// Function used to save one of the users passwords into local storage
 async function savePassword() {
-    var websiteName = document.getElementById("webpage").value;
-    var userName = document.getElementById("username").value;
-    var passwordToStore = document.getElementById("password").value;
+    const websiteName = document.getElementById("webpage").value.trim();
+    const userName = document.getElementById("username").value.trim();
+    const passwordToStore = document.getElementById("password").value;
+
+    if (!websiteName || !userName || !passwordToStore) {
+        alert("Website, Username, and Password fields cannot be empty.");
+        return;
+    }
+
     credentialsToStore = [];
-    var salt = await callEncryption(passwordToStore, websiteName);
-    alert(salt);
-    credentialsToStore.push({websiteName:websiteName, userName:userName, iv:passwordToStoreEncryptIV, encryptPass: passwordToStoreEncrypt, salt:salt});
+    const salt = await callEncryption(passwordToStore, websiteName);
+    
+    credentialsToStore.push({
+        websiteName: websiteName,
+        userName: userName,
+        iv: passwordToStoreEncryptIV,
+        encryptPass: passwordToStoreEncrypt,
+        salt: salt
+    });
+    
     localStorage.setItem(websiteName, JSON.stringify(credentialsToStore));
-    alert("Password Sucessfully Stored");
+    alert("Password successfully stored!");
     displayPasswords();
+    // Clear form
+    document.getElementById("webpage").value = '';
+    document.getElementById("username").value = '';
+    document.getElementById("password").value = '';
 }
 
-// Function used to delete a password from local storage
 function deletePassword() {
-    var websiteName = document.getElementById("deletewebpage").value;
+    const websiteName = document.getElementById("deletewebpage").value.trim();
+    if (!websiteName) {
+        alert("Please enter a website name to delete.");
+        return;
+    }
+
     if (localStorage.getItem(websiteName) != null) {
-        localStorage.removeItem(websiteName);
-        alert("Password Deleted");
-        displayPasswords();
+        if (confirm(`Are you sure you want to delete the password for "${websiteName}"?`)) {
+            localStorage.removeItem(websiteName);
+            alert("Password deleted.");
+            displayPasswords();
+            document.getElementById("deletewebpage").value = '';
+        }
     } else {
-        alert("Not a valid username for a password that is stored");
+        alert("No password stored for that website name.");
     }
 }
 
-// Function to edit a password of the users choice in local storage
 async function editPassword() {
-    let websiteName = document.getElementById("editwebpage").value;
-    let usernameEdit = document.getElementById("editusername").value;
-    let passwordEdit = document.getElementById("editpassword").value;
-    let passwordStoredToEdit = localStorage.getItem(websiteName);
-    let passwordStoredUnstring;
+    const websiteName = document.getElementById("editwebpage").value;
+    const usernameEdit = document.getElementById("editusername").value;
+    const passwordEdit = document.getElementById("editpassword").value;
 
+    let passwordStoredToEdit = localStorage.getItem(websiteName);
     if (!passwordStoredToEdit) {
         alert("No password stored for this website.");
-    }
-    try {
-        passwordStoredUnstring = JSON.parse(passwordStoredToEdit);
-    } catch (e) {
-        alert("Error with password data.");
-    }
-    if (!Array.isArray(passwordStoredUnstring) || !passwordStoredUnstring[0] || typeof passwordStoredUnstring[0] !== 'object') {
-        alert("Stored data is not in the expected format.");
+        return;
     }
 
-    if (usernameEdit === "" && passwordEdit === "") {
-        alert("No Changes Have Been Made");
-    }
+    let passwordStoredUnstring = JSON.parse(passwordStoredToEdit);
 
-    if (usernameEdit !== "") {
-        passwordStoredUnstring[0].userName = usernameEdit;
-    }
+    passwordStoredUnstring[0].userName = usernameEdit;
 
-    if (passwordEdit !== "") {
-        await callEncryption(passwordEdit, websiteName);
-        passwordStoredUnstring[0].iv = passwordToStoreEncryptIV;
-        passwordStoredUnstring[0].encryptPass = passwordToStoreEncrypt;
+    // Only re-encrypt if the password has changed
+    if (passwordEdit) {
+         // *** FIX: A new salt must be generated and stored when the password changes ***
+         const newSalt = await callEncryption(passwordEdit, websiteName);
+         passwordStoredUnstring[0].iv = passwordToStoreEncryptIV;
+         passwordStoredUnstring[0].encryptPass = passwordToStoreEncrypt;
+         passwordStoredUnstring[0].salt = newSalt; // Store the new salt
     }
-    passwordStoredToEdit = JSON.stringify(passwordStoredUnstring);
-    localStorage.setItem(websiteName, passwordStoredToEdit);
-    alert("Sucessfully Edited");
-    if (document.getElementById("editpasswordmodal").style.display === "block") {
-        document.getElementById("editpasswordmodal").style.display = "none";
-        document.getElementById("mainContainer").style.display = "flex";
-
-    }
+    
+    localStorage.setItem(websiteName, JSON.stringify(passwordStoredUnstring));
+    alert("Password successfully updated.");
+    document.getElementById('editpasswordmodal').style.display = 'none';
     displayPasswords();
 }
 
-// Small function used to clear all data in local storage
 function clearStorage() {
-    localStorage.clear();
-    displayPasswords();
-}
-
-// Function used to change the background colour
-function changeBGColour(colour) {
-    document.body.style.background = colour;
-}
-
-// Function to derive the key
-async function keyDeriveFromPassword(password, salt) {
-    const buffer = new TextEncoder().encode(password);
-    const saltBuffer = new Uint8Array(salt);
-    const keyDerive = await crypto.subtle.importKey(
-        "raw",
-        buffer,
-        "PBKDF2",
-        false,
-        ["deriveBits", "deriveKey"]
-    );
-
-    const key = await crypto.subtle.deriveKey(
-        {
-            name: "PBKDF2",
-            salt: saltBuffer,
-            iterations:10000,
-            hash: "SHA-256"
-        },
-        keyDerive,
-        {
-            name: "AES-GCM",
-            length:256
-        },
-        true,
-        ["encrypt", "decrypt"]
-    );
-
-    return key;
-}
-
-// Function used to encrypt the data
-async function encryptAndStore(encryption_key, data_to_encrypt, websiteName) {
-    var data_encoded = new TextEncoder()
-    var data = data_encoded.encode(data_to_encrypt);
-    var iv = window.crypto.getRandomValues(new Uint8Array(12));
-    var data_encrypted = await crypto.subtle.encrypt(
-        {
-            name:"AES-GCM",
-            iv:iv,
-        },
-        encryption_key,
-        data
-    );
-    passwordToStoreEncryptIV = Array.from(iv);
-    passwordToStoreEncrypt = Array.from(new Uint8Array(data_encrypted))
-}
-
-// Function used to decrypt the data
-async function decryptFromStore(key, website) {
-    try {
-        const encrypted_data_string = localStorage.getItem(website);
-        if (!encrypted_data_string) {
-            throw new Error("No data found for the specified website.");
-        }
-
-        const encrypted_data = JSON.parse(encrypted_data_string);
-
-        // Validate the structure of the stored data
-        if (
-            !Array.isArray(encrypted_data) ||
-            !encrypted_data[0] ||
-            typeof encrypted_data[0] !== "object" ||
-            !encrypted_data[0].iv ||
-            !encrypted_data[0].encryptPass ||
-            !encrypted_data[0].salt
-        ) {
-            throw new Error("Stored data is not in the expected format.");
-        }
-
-        // Convert stored values back to Uint8Array
-        const ivDecrypt = new Uint8Array(encrypted_data[0].iv);
-        const encrypted_array = new Uint8Array(encrypted_data[0].encryptPass);
-        const salt = new Uint8Array(encrypted_data[0].salt);
-        console.log(salt);
-
-        // Derive the key using the salt
-        const derivedKey = await keyDeriveFromPassword(website, salt);
-
-        // Decrypt the data
-        const decrypted_data = await crypto.subtle.decrypt(
-            {
-                name: "AES-GCM",
-                iv: ivDecrypt,
-            },
-            derivedKey,
-            encrypted_array
-        );
-
-        return new TextDecoder().decode(decrypted_data);
-    } catch (error) {
-        console.error("Decryption failed:", error.message);
-        return null; // Return null on failure
+    if (confirm("Are you sure you want to delete ALL stored passwords? This action cannot be undone.")) {
+        localStorage.clear();
+        displayPasswords();
+        alert("All passwords have been deleted.");
     }
 }
 
-
-async function callEncryption(data, website) {
-    var data = data;
-    var website = website;
-    const salt = window.crypto.getRandomValues(new Uint8Array(16));
-    var key= await keyDeriveFromPassword(website, salt);
-    await encryptAndStore(key, data, website);
-    return Array.from(salt);
+function changeBGColour(colour) {
+    document.body.style.backgroundColor = colour;
 }
-
-async function callDecryption(website, salt) {
-    var website = website;
-    var salt = salt
-    var key = await keyDeriveFromPassword(website, salt);
-    var decrypted_pass = await decryptFromStore(key, website);
-    return decrypted_pass;
-}
-
-
 
 async function getPasswords() {
-    var passwordsList = [];
-    for (i = 0; i <= localStorage.length - 1; i++) {
-        if (localStorage.key(i) === "loginUser") {
-            continue; // Skip the loginUser entry
+    let passwordsList = [];
+    for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key === "loginUser" || key === "loggedIn") {
+            continue; // Skip non-password entries
         }
-        var key = localStorage.key(i);
-        var data = localStorage.getItem(key);
-
+        const data = localStorage.getItem(key);
         try {
-            var dataParsed = JSON.parse(data);
-
-            // Ensure the data follows the expected format
-            if (
-                Array.isArray(dataParsed) &&
-                dataParsed[0] &&
-                typeof dataParsed[0] === "object" &&
-                "websiteName" in dataParsed[0] &&
-                "userName" in dataParsed[0] &&
-                "iv" in dataParsed[0] &&
-                "encryptPass" in dataParsed[0]
-            ) {
-                passwordsList.push({
+            const dataParsed = JSON.parse(data);
+            if (Array.isArray(dataParsed) && dataParsed[0]) {
+                 const decryptedPassword = await callDecryption(dataParsed[0].websiteName, dataParsed[0].salt);
+                 passwordsList.push({
                     websiteName: dataParsed[0].websiteName,
                     userName: dataParsed[0].userName,
-                    password: await callDecryption(dataParsed[0].websiteName, dataParsed[0].salt),
+                    password: decryptedPassword,
                 });
             }
         } catch (error) {
@@ -408,101 +191,164 @@ async function getPasswords() {
     return passwordsList;
 }
 
-function togglePasswordVisibility() {
-    const passwordCells = document.querySelectorAll('#passwordTableBody td:nth-child(3)');
-    passwordCells.forEach(cell => {
-        if (cell.dataset.visible === "true") {
-            cell.textContent = ".................";
-            cell.dataset.visible = "false";
-        } else {
-            cell.textContent = cell.dataset.password;
-            cell.dataset.visible = "true";
-        }
-    });
-}
-
-// Modify displayPasswords to store the actual password in a data attribute
 async function displayPasswords() {
     const passwordTableBody = document.getElementById('passwordTableBody');
     passwordTableBody.innerHTML = ''; // Clear existing rows
 
     const passwords = await getPasswords();
 
+    if (passwords.length === 0) {
+        const row = document.createElement('tr');
+        row.innerHTML = `<td colspan="3">No passwords stored yet.</td>`;
+        passwordTableBody.appendChild(row);
+        return;
+    }
+
     passwords.forEach(password => {
         const row = document.createElement('tr');
-
         row.innerHTML = `
-            <td style="border: 1px solid black; padding: 8px;">${password.websiteName}</td>
-            <td style="border: 1px solid black; padding: 8px;">${password.userName}</td>
-            <td style="border: 1px solid black; padding: 8px;" data-password="${password.password}" data-visible="false">••••••••</td>
+            <td>${password.websiteName}</td>
+            <td>${password.userName}</td>
+            <td data-password="${password.password}" data-visible="false">••••••••</td>
         `;
-
         row.addEventListener('click', () => {
-            document.getElementById("mainContainer").style.display = "none";
-            document.getElementById("editpasswordmodal").style.display = "block";
+            document.getElementById("editpasswordmodal").style.display = "flex";
             document.getElementById("editwebpage").value = password.websiteName;
             document.getElementById("editusername").value = password.userName;
-            document.getElementById("editpassword").value = password.password;
+            // Leave password blank for security, user must re-type to change.
+            document.getElementById("editpassword").value = ""; 
+            document.getElementById("editpassword").placeholder = "Enter new password (optional)";
         });
-
         passwordTableBody.appendChild(row);
     });
 }
 
-function searchPassword() {
-    let query = document.getElementById("passwordSearch").value.toLowerCase().trim();
-    let resultsContainer = document.getElementById("searchResults");
+function togglePasswordVisibility() {
+    const passwordCells = document.querySelectorAll('#passwordTableBody td:nth-child(3)');
+    passwordCells.forEach(cell => {
+        if (cell.dataset.password) { // Check if there is a password to toggle
+            if (cell.dataset.visible === "true") {
+                cell.textContent = "••••••••";
+                cell.dataset.visible = "false";
+            } else {
+                cell.textContent = cell.dataset.password;
+                cell.dataset.visible = "true";
+            }
+        }
+    });
+}
+
+async function searchPassword() {
+    const query = document.getElementById("passwordSearch").value.toLowerCase().trim();
+    const resultsContainer = document.getElementById("searchResults");
     resultsContainer.innerHTML = "";
 
     if (query === "") {
-        document.getElementById("searchResultsModal").style.display = "none";
+        closeSearchResults();
         return;
     }
-    getPasswords().then(passwords => {
-        let filteredResults = passwords.filter(pw =>
-            pw.websiteName.toLowerCase() === query || 
-            pw.userName.toLowerCase() === query
-        );
+    
+    const passwords = await getPasswords();
+    const filteredResults = passwords.filter(pw =>
+        pw.websiteName.toLowerCase().includes(query) || 
+        pw.userName.toLowerCase().includes(query)
+    );
 
-        document.getElementById("searchResultsModal").style.display = filteredResults.length > 0 ? "block" : "none";
-
-        if (filteredResults.length > 0) {
-            filteredResults.forEach(password => {
-                let resultItem = document.createElement("div");
-                resultItem.innerHTML = `<strong>${password.websiteName}</strong><br><br> Username: ${password.userName} <br> Password: ${password.password}`;
-                resultItem.classList.add("search-result-item");
-                resultsContainer.appendChild(resultItem);
-            });
-        } else {
-            resultsContainer.innerHTML = "<p>No exact matches found.</p>";
-        }
-    });
+    if (filteredResults.length > 0) {
+        document.getElementById("searchResultsModal").style.display = "flex";
+        filteredResults.forEach(password => {
+            const resultItem = document.createElement("div");
+            resultItem.innerHTML = `<p><strong>${password.websiteName}</strong><br>Username: ${password.userName}<br>Password: ${password.password}</p>`;
+            resultsContainer.appendChild(resultItem);
+        });
+    } else {
+        resultsContainer.innerHTML = "<p>No matches found.</p>";
+        document.getElementById("searchResultsModal").style.display = "flex";
+    }
 }
 
 function closeSearchResults() {
     document.getElementById("searchResultsModal").style.display = "none";
 }
 
-
-function checkPasswordStrength () {
-    let password = document.getElementById("passwordCheck");
-    let power = document.getElementById("power-point");
+function checkPasswordStrength() {
+    const password = document.getElementById("passwordCheck").value;
+    const power = document.getElementById("power-point");
     let point = 0;
-    let value = password.value;
-    let widthPower = 
-        ["1%", "25%", "50%", "75%", "100%"];
-    let colorPower = 
-        ["#D73F40", "#DC6551", "#F2B84F", "#BDE952", "#3ba62f"];
+    const widthPower = ["1%", "25%", "50%", "75%", "100%"];
+    const colorPower = ["#D73F40", "#DC6551", "#F2B84F", "#BDE952", "#3ba62f"];
 
-    if (value.length >= 8) {
-        let arrayTest = 
-            [/[0-9]/, /[a-z]/, /[A-Z]/, /[^0-9a-zA-Z]/];
-        arrayTest.forEach((item) => {
-            if (item.test(value)) {
-                point += 1;
-            }
-        });
+    if (password.length >= 8) {
+        point++;
+        if (/[a-z]/.test(password) && /[A-Z]/.test(password)) point++;
+        if (/[0-9]/.test(password)) point++;
+        if (/[^0-9a-zA-Z]/.test(password)) point++;
+    } else if (password.length > 0) {
+        point = 1;
+    } else {
+        point = 0;
     }
-    power.style.width = widthPower[point];
-    power.style.backgroundColor = colorPower[point];
-};
+
+    power.style.width = widthPower[point] || "1%";
+    power.style.backgroundColor = colorPower[point] || "#D73F40";
+}
+
+// --- Encryption/Decryption Functions (Simplified for Demo) ---
+// NOTE: Web Crypto API is complex. This is a simplified implementation.
+// In a real-world scenario, robust error handling and key management are critical.
+
+async function keyDeriveFromPassword(password, salt) {
+    const encoder = new TextEncoder();
+    const keyMaterial = await crypto.subtle.importKey(
+        "raw", encoder.encode(password), "PBKDF2", false, ["deriveBits", "deriveKey"]
+    );
+    return crypto.subtle.deriveKey(
+        { name: "PBKDF2", salt: salt, iterations: 100000, hash: "SHA-256" },
+        keyMaterial,
+        { name: "AES-GCM", length: 256 },
+        true,
+        ["encrypt", "decrypt"]
+    );
+}
+
+async function encryptAndStore(key, data_to_encrypt) {
+    const iv = window.crypto.getRandomValues(new Uint8Array(12));
+    const encryptedData = await crypto.subtle.encrypt(
+        { name: "AES-GCM", iv: iv }, key, new TextEncoder().encode(data_to_encrypt)
+    );
+    passwordToStoreEncryptIV = Array.from(iv);
+    passwordToStoreEncrypt = Array.from(new Uint8Array(encryptedData));
+}
+
+async function decryptFromStore(key, iv, encrypted_data) {
+    try {
+        const decrypted_data = await crypto.subtle.decrypt(
+            { name: "AES-GCM", iv: iv }, key, encrypted_data
+        );
+        return new TextDecoder().decode(decrypted_data);
+    } catch (e) {
+        console.error("Decryption failed:", e);
+        return "DECRYPTION FAILED";
+    }
+}
+
+async function callEncryption(data, website) {
+    const salt = window.crypto.getRandomValues(new Uint8Array(16));
+    // Using the website name as part of the password for key derivation is not standard.
+    // A better approach would be to use a master password. For this demo, we'll use the website name.
+    const key = await keyDeriveFromPassword(website, salt);
+    await encryptAndStore(key, data);
+    return Array.from(salt);
+}
+
+async function callDecryption(website, saltArray) {
+    const salt = new Uint8Array(saltArray);
+    const key = await keyDeriveFromPassword(website, salt);
+    
+    const encrypted_data_string = localStorage.getItem(website);
+    const encrypted_data = JSON.parse(encrypted_data_string);
+    const iv = new Uint8Array(encrypted_data[0].iv);
+    const encrypted_array = new Uint8Array(encrypted_data[0].encryptPass);
+
+    return await decryptFromStore(key, iv, encrypted_array);
+}

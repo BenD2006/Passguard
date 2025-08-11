@@ -17,10 +17,9 @@
     </script>
     <script src="script.js"></script>
 </head>
-<body class = "highlight">
-    <div id="editpasswordmodal" class="editmodal" style="display:none;">
-        <button id="savemodalclose" onclick="document.getElementById('editpasswordmodal').style.display = 'none'; document.getElementById('mainContainer').style.display='flex'" type="button">Close</button>
-        <h2>Edit Password</h2>
+<body>
+    <!-- Edit Password Modal -->
+    <div id="editpasswordmodal" class="editmodal">
         <form class="modal-content">
             <div style="display: flex; flex-direction: column; align-items: center;">
                 <label for="editwebpage">Website Name:</label>
@@ -40,21 +39,34 @@
     <div id="mainContainer" class="responsive-container">
         <h1>PassGuard</h1> 
         <div id="menuRight">
-            <button type="button" class="logoutbutton" onclick=logout()>Log Out</button>
-            <button type="button" class="clearbutton" onclick=clearStorage()>Clear Storage</button>
-            <button type="button" class="settingsbutton" onclick="document.getElementById('settingsWindow').style.display = 'block'">Settings</button>
+            <button type="button" onclick="logout()">Log Out</button>
+            <button type="button" onclick="clearStorage()">Clear Storage</button>
+            <button type="button" onclick="document.getElementById('settingsWindow').style.display = 'flex'">Settings</button>
         </div>
 
-        <div id="savePasswordArea">
-                <h3>Save Password to Password Storage</h3>
-                <form> 
-                    <label for="webpage">Webpage Name:</label> <br>
-                    <input type="text" id="webpage" name="webpage" value="" style="width: 580px; height:25px;"><br><br>
-                    <label for="username">Username/Email:</label><br>
-                    <input type="text" id="username" name="username" value="" style="width: 580px; height:25px;"><br><br>
-                    <label for="password">Password:</label><br>
-                    <input type="password" id="password" name="password" value="" style="width: 580px; height:25px;"><br><br>
-                    <button onclick=savePassword() type="button" style="height: 40px; width: 600px;">Submit</button>
+        <div id="searchContainer">
+            <input type="text" id="passwordSearch" placeholder="Search passwords by website or username...">
+            <button onclick="searchPassword()">Search</button>
+        </div>
+        
+        <!-- NEW: Wrapper for the left column grid -->
+        <div id="left-column">
+            <div id="savePasswordArea">
+                <h3>Save New Password</h3>
+                <form onsubmit="event.preventDefault(); savePassword();"> 
+                    <div>
+                        <label for="webpage">Webpage Name:</label>
+                        <input type="text" id="webpage" name="webpage" value="">
+                    </div>
+                    <div>
+                        <label for="username">Username/Email:</label>
+                        <input type="text" id="username" name="username" value="">
+                    </div>
+                    <div>
+                        <label for="password">Password:</label>
+                        <input type="password" id="password" name="password" value="">
+                    </div>
+                    <button type="submit">Submit</button>
                 </form>
         </div>
         
@@ -68,13 +80,14 @@
         </div>
 
         <div id="showPasswordArea">
-                <h3>Stored Passwords</h3>
-                <p>Click on a website name to edit that password</p>
-                <button onclick="togglePasswordVisibility()">Toggle Passwords Visibility</button> <br><br>
+            <h3>Stored Passwords</h3>
+            <p>Click on a row to edit a password.</p>
+            <button onclick="togglePasswordVisibility()">Toggle Passwords Visibility</button>
+            <div style="overflow-x: auto;">
                 <table id="passwordTable">
                     <thead>
                         <tr>
-                            <th>Website Name</th>
+                            <th>Website</th>
                             <th>Username/Email</th>
                             <th>Password</th>
                         </tr>
